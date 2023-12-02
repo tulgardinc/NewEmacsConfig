@@ -329,13 +329,6 @@ Setup projectile for treemacs
     :defer t)
 #+end_src
 
-* Hydra
-#+begin_src elisp
-  (use-package hydra
-    :defer t
-    :straight t)
-#+end_src
-
 * Emacs startup profilier ESUP
 #+begin_src elisp
   (use-package esup

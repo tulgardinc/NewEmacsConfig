@@ -222,10 +222,6 @@
   :straight t
   :defer t)
 
-(use-package hydra
-  :defer t
-  :straight t)
-
 (use-package esup
   :straight t
   :init
