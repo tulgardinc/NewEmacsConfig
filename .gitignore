@@ -1,0 +1,11 @@
+/.cache/
+/.config.org.~undo-tree~
+/.lsp-session-v1
+/auto-save-list/
+/eln-cache/
+/elpa/
+/eshell/
+/projectile-bookmarks.eld
+/recentf
+/straight/
+/tramp
