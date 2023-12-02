@@ -1,0 +1,117 @@
+# greeting message
+function fish_greeting
+    pfetch
+end
+
+# start starship prompt
+if test "$TERM" != "dumb"
+    starship init fish | source
+end
+
+# set color scheme
+scheme set monokai
+
+# enable vi mode and set cursor
+fish_vi_key_bindings
+
+set fish_cursor_default block blink
+set fish_cursor_insert line blink
+set fish_cursor_replace_one underscore blink
+set fish_cursor_visual block
+
+# set default editor
+set -Ux EDITOR nvim
+set -Ux XDG_DATA_DIRS "/usr/local/share:/usr/share"
+# aliases
+alias chrome="flatpak run com.github.Eloston.UngoogledChromium"
+alias cl="clear"
+alias gf="git-flow"
+alias trk="setxkbmap tr && echo 'switched to tr'"
+alias usk="setxkbmap us && echo 'switched to us'"
+alias ls="exa -lha ;and echo ''(exa -a | wc -l)' items in directory: ' (du -sh) "
+alias n="nvim"
+alias wacomsetup="$HOME/scripts/wacomsetup"
+alias p="sudo pacman"
+alias pkey="sudo pacman -Sy archlinux-key-ring"
+alias f="nvim $HOME/.config/fish/config.fish"
+alias sf="source $HOME/.config/fish/config.fish"
+alias i3c="nvim $HOME/.config/i3/config"
+alias se="sudoedit"
+alias rn="ranger"
+alias stui="sudo s-tui"
+alias hpconnect="bluetoothctl connect 00:16:94:3F:08:84"
+alias fixtime="sudo ntpd -qg"
+alias mountwin="sudo mount /dev/nvme0n1p5 /mnt/windowspart/"
+alias badapple="CACA_DRIVER=ncurses mpv --really-quiet -vo=caca 'https://www.youtube.com/
+watch?v=FtutLA63Cp8'"
+alias emacs="/home/ts/emacsbuild/emacs/src/emacs"
+alias emacsclient="/home/ts/emacsbuild/emacs/lib-src/emacsclient"
+
+
+# add to path
+#set -gx PATH \$PATH "$HOME/scripts:$PATH"
+#set -gx PATH \$PATH "/usr/bin/pdflatex:$PATH"
+#set -gx PATH \$PATH "$HOME/.local/bin:$PATH"
+#set -gx PATH \$PATH "$HOME/.android/avd:$PATH"
+#set -gx PATH \$PATH "usr/local/bin:$PATH"
+#set -gx PATH \$PATH "$HOME/.cargo/bin:$PATH"
+
+fish_add_path "$HOME/scripts"
+fish_add_path /usr/bin/pdflatex
+fish_add_path "$HOME/.local/bin"
+fish_add_path "$HOME/.android/avd"
+fish_add_path usr/local/bin
+fish_add_path "$HOME/.cargo/bin"
+
+
+# flutter related 
+set JAVA_OPTS = "-XX:+IgnoreUnrecognizedVMOptions --add-modules java.se.ee"
+set -x JAVA_HOME "/usr/lib/jvm/jdk-10.0.2/"
+#set -x JAVA_HOME /usr/lib/jvm/java-17-openjdk/
+set ANDROID_HOME /opt/android-sdk
+#set -gx PATH \$PATH "/opt/flutter/bin:$PATH"
+#set -gx PATH \$PATH "$ANDROID_HOME/emulator:$PATH"
+#set -gx PATH \$PATH "$ANDROID_HOME/platform-tools/:$PATH"
+#set -gx PATH \$PATH "$ANDROID_HOME/tools/bin/:$PATH"
+#set -gx PATH \$PATH "$ANDROID_HOME/tools/:$PATH"
+#set -gx PATH \$PATH "$ANDROID_HOME/emulator:$PATH"
+#set -gx PATH \$PATH "$HOME/.pub-cache/bin:$PATH"
+
+
+fish_add_path /opt/flutter/bin
+fish_add_path "$ANDROID_HOME/emulator"
+fish_add_path "$ANDROID_HOME/platform-tools/"
+fish_add_path "$ANDROID_HOME/tools/bin/"
+fish_add_path "$ANDROID_HOME/tools/"
+fish_add_path "$ANDROID_HOME/emulator"
+fish_add_path "$HOME/.pub-cache/bin"
+
+#django vars
+set -gx KODLAMAOGREN_SECRET_KEY = 'i=_5h*cg+(t-)ior%cduwr7yw642xh%$gczfflo$nz2*(zq%^m'
+set -gx KODLAMAOGREN_EMAIL_PASSWORD = 'tmxEDZm+_4Cj$2UA6dch'
+set -gx KODLAMAOGREN_DEBUG_VAL = True
+set -Ux LIBVA_DRIVER_NAME = "vdpau"
+
+function vterm_printf
+    if begin
+            [ -n "$TMUX" ]; and string match -q -r "screen|tmux" "$TERM"
+        end
+        # tell tmux to pass the escape sequences through
+        printf "\ePtmux;\e\e]%s\007\e\\" "$argv"
+    else if string match -q -- "screen*" "$TERM"
+        # GNU screen (screen, screen-256color, screen-256color-bce)
+        printf "\eP\e]%s\007\e\\" "$argv"
+    else
+        printf "\e]%s\e\\" "$argv"
+    end
+end
+
+function vterm_prompt_end
+    vterm_printf '51;A'(whoami)'@'(hostname)':'(pwd)
+end
+
+function fish_title
+    hostname
+    echo ":"
+    prompt_pwd
+end

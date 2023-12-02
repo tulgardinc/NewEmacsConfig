@@ -8,8 +8,6 @@
           (lambda ()
             (add-hook 'after-save-hook #'org-babel-tangle-config)))
 
-;; relax the garbage collector
-(setq gc-cons-threshold 1000000000)
 
 ;; load config.org
 (load-file "~/.emacs.d/config.el")

@@ -1,6 +1,17 @@
 #+title: Emacs Config
 #+PROPERTY: header-args :tangle config.el :results none
 
+* Set GC to a relaxed value
+this speeds up init time
+#+begin_src emacs-lisp :tangle yes
+(setq gc-cons-threshold 10000000000)
+#+end_src
+
+* Compile Elisp binaries JIT
+#+begin_src emacs-lisp :tangle yes
+(setq comp-deferred-compilation t)
+#+end_src
+
 * Cleanup the UI and Emacs weirdness
 make visuals make sense and sound
 
@@ -13,8 +24,11 @@ make visuals make sense and sound
   (setq ring-bell-function 'ignore)
 
   ; background
-  (set-frame-parameter nil 'alpha-background 75)
-  (add-to-list 'default-frame-alist '(alpha-background . 75))
+  (set-frame-parameter nil 'alpha-background 60)
+  (add-to-list 'default-frame-alist '(alpha-background . 60))
+
+  ; make warnings buffer only appear if there is an error
+  (setq warning-minimum-level :error)
 #+end_src
 
 make backups go to the current directory
@@ -141,7 +155,7 @@ and evil collection for many other modes
 
 * Set font
 #+begin_src emacs-lisp :tangle yes
-(set-face-attribute 'default nil :family "JetBrainsMonoNerdFont" :height 105)
+(set-face-attribute 'default nil :family "JetBrainsMono Nerd Font" :height 110)
 ;(set-face-attribute 'default nil :family "Ubuntu mono" :height 120)
 #+end_src
 
@@ -327,14 +341,42 @@ Multiple emacs "windows"
     :defer t)
 #+end_src
 
+* Olivetti mode
+Center the screen with org mode for a nicer writing experience
+#+begin_src emacs-lisp :tangle yes
+  (use-package olivetti
+    :straight t
+    :defer t
+    :hook
+    (org-mode . (lambda () (olivetti-mode) (olivetti-set-width 120)))
+    (dashboard-mode . (lambda () (olivetti-mode) (olivetti-set-width 150)))
+    )
+#+end_src
+
+* Emacs custom dashboard
+#+begin_src emacs-lisp :tangle yes
+  (use-package dashboard
+    :straight t
+    :config
+    (dashboard-setup-startup-hook)
+    (setq dashboard-startup-banner 'logo)
+    )
+#+end_src
+
+* Bug hunter
+It's hard to debug emacs so this is pretty nice
+#+begin_src elisp
+  (use-package bug-hunter
+    :straight t
+    :defer t)
+#+end_src
+
 * Reset garbage collector value default
 #+begin_src elisp
 (setq gc-cons-threshold 800000)
 #+end_src
 
-* Launch whatever startup buffer
-#+begin_src elisp
-  (find-file "/home/ubuntu/.emacs.d/config.org")
-#+end_src
-
-
+* Plugins to look into
+- Zoom
+- Dirvish or Ranger
+- Org roam
