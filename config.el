@@ -19,10 +19,6 @@
 (setq backup-directory-alist `(("." . "~/.emacs.d/emacs_saves")))
 (setq backup-by-copying t)
 
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-(package-initialize)
-
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -61,11 +57,6 @@
   (setq evil-want-integration t)
   :config
   (evil-mode)
-  (define-key evil-normal-state-map (kbd "C-b") #'helm-mini)
-  (define-key evil-normal-state-map (kbd "C-x C-f") 'helm-find-files)
-  (define-key evil-normal-state-map (kbd "C-f") 'treemacs)
-  (define-key evil-normal-state-map (kbd "C-p") 'projectile-find-file)
-  (define-key evil-normal-state-map (kbd "S-C-p") 'helm-projectile-rg)
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
   (evil-set-undo-system 'undo-tree)
@@ -78,6 +69,12 @@
   :config
   (evil-collection-init)
   )
+
+(use-package evil-surround
+  :straight t 
+  :after evil
+  :config
+  (global-evil-surround-mode))
 
 (use-package undo-tree
   :straight t
@@ -92,6 +89,7 @@
   (load-theme 'doom-moonlight t)
   ;(setq doom-themes-treemacs-theme "moonlight")
   ;(doom-themes-treemacs-config)
+  (define-key evil-normal-state-map (kbd "C-f") 'treemacs)
   (doom-themes-org-config)
   )
 
@@ -130,19 +128,27 @@
   (setq lsp-rust-analyzer-display-parameter-hints t)
   )
 
+(use-package flymake
+  :straight t
+  :hook (emacs-lisp-mode . flymake-mode))
+
 (use-package helm
   :straight t
   :config
   (helm-mode)
   (setq helm-split-window-in-side-p t)
-  (global-set-key (kbd "C-x C-f") 'helm-find-files)
-  (global-set-key (kbd "M-x") 'helm-M-x)
-  (define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action)
-  (define-key helm-read-file-map (kbd "<C-backspace>") #'backward-kill-word)
-  (define-key helm-map (kbd "<escape>") 'helm-keyboard-quit)
+  (define-key evil-normal-state-map (kbd "C-b") #'helm-mini)
+  (define-key evil-normal-state-map (kbd "C-x C-f") 'helm-find-files)
+  :bind
+  (("M-x" . helm-M-x)
+   ("C-x C-f" . helm-find-files)
+   :map helm-map
+   ("<tab>" . helm-execute-persistent-action)
+   ("<C-backspace>" . backward-kill-word)
+   ("<escape>" . helm-keyboard-quit))
   )
 
-					; keep helm in place
+  					; keep helm in place
 (use-package shackle
   :straight t
   :config
@@ -160,7 +166,10 @@
 
 (use-package helm-projectile
   :defer t
-  :straight t)
+  :straight t
+  :config
+  (define-key evil-normal-state-map (kbd "S-C-p") 'helm-projectile-rg)
+  )
 
 (use-package ripgrep
   :defer t
@@ -174,7 +183,7 @@
 (use-package company
   :straight t
   :defer t
-  :after lsp-mode
+  :hook (emacs-lisp-mode . company-mode)
   :config
   (global-company-mode)
   )
@@ -204,7 +213,10 @@
 
 (use-package projectile
   :straight t
-  :defer t)
+  :defer t
+  :config
+  (define-key evil-normal-state-map (kbd "C-p") 'projectile-find-file)
+  )
 
 (use-package treemacs-projectile
   :straight t
@@ -215,11 +227,9 @@
   :straight t)
 
 (use-package esup
-  :ensure t
+  :straight t
   :init
-					; might need to move this before use-package
-  (setq esup-depth 0)
-  :straight t)
+  (setq esup-depth 0))
 
 (use-package eyebrowse
   :straight t
@@ -250,5 +260,43 @@
 (use-package bug-hunter
   :straight t
   :defer t)
+
+(use-package which-key
+  :straight t
+  :config
+  (which-key-mode))
+
+(use-package dired
+  :straight nil
+  :defer t
+  :after evil-collection
+  :custom
+  (dired-listing-switches "-lagho --group-directories-first")
+  (setq dired-dwim-target t)
+  )
+
+(defun go-home () (interactive)
+       (find-alternate-file "/home/ts"))
+
+(use-package dired-single
+  :straight t
+  :after dired
+  :config (evil-collection-define-key 'normal 'dired-mode-map
+            "h" 'dired-single-up-directory
+            "l" 'dired-single-buffer
+            "q" 'kill-buffer-and-window
+            "gh" 'go-home))
+
+(use-package all-the-icons-dired
+  :straight t
+  :after dired
+  :hook (dired-mode . all-the-icons-dired-mode))
+
+(use-package dired-hide-dotfiles
+  :straight t
+  :after dired
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "H" 'dired-hide-dotfiles-mode))
 
 (setq gc-cons-threshold 800000)
