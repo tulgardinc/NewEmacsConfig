@@ -121,15 +121,23 @@
 )
 
 (use-package lsp-mode
-  :straight t
-  :defer t
-  :config
-  (setq lsp-inlay-hint-enable t)
-  (setq lsp-rust-analyzer-inlay-hints-mode t)
-  (setq lsp-rust-analyzer-server-display-hints t)
-  (setq lsp-rust-analyzer-display-chaining-hints t)
-  (setq lsp-rust-analyzer-display-parameter-hints t)
-  )
+    :straight t
+    :defer t
+    :config
+    (setq lsp-inlay-hint-enable t)
+    (setq lsp-rust-analyzer-inlay-hints-mode t)
+    (setq lsp-rust-analyzer-server-display-hints t)
+    (setq lsp-rust-analyzer-display-chaining-hints t)
+    (setq lsp-rust-analyzer-display-parameter-hints t)
+    )
+
+  (use-package lsp-ui
+    :straight t
+    :after lsp-mode
+    ;:custom
+    ;(lsp-ui-doc-use-childframe t)
+    ;(setq lsp-ui-doc-use-webkit t)
+)
 
 (use-package flymake
   :straight t
@@ -202,17 +210,18 @@
   :defer t)
 
 (use-package treemacs
-  :defer t
-  :straight t)
+    :defer t
+    :straight t
+:config ())
 
-(use-package treemacs-evil
-  :after treemacs
-  :straight t)
+  (use-package treemacs-evil
+    :after treemacs
+    :straight t)
 
-(use-package treemacs-nerd-icons
-  :straight t
-  :config (treemacs-load-theme "nerd-icons")
-  )
+  (use-package treemacs-nerd-icons
+    :straight t
+    :config (setq treemacs-width 30)
+    )
 
 (use-package projectile
   :straight t

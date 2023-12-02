@@ -1,6 +1,11 @@
 #+title: Emacs Config
 #+PROPERTY: header-args :tangle config.el :results none
 
+* Things to do
+** TODO Prettier headers
+** TODO Nicer title
+** TODO Hide the leading *
+
 * Plugins to look into
 - Zoom
 - Dirvish maybe in the future if dired is not good enough
@@ -188,16 +193,24 @@ Make unimportant buffers darker
 
 * Lsp-mode
 #+begin_src elisp
-  (use-package lsp-mode
-    :straight t
-    :defer t
-    :config
-    (setq lsp-inlay-hint-enable t)
-    (setq lsp-rust-analyzer-inlay-hints-mode t)
-    (setq lsp-rust-analyzer-server-display-hints t)
-    (setq lsp-rust-analyzer-display-chaining-hints t)
-    (setq lsp-rust-analyzer-display-parameter-hints t)
-    )
+    (use-package lsp-mode
+      :straight t
+      :defer t
+      :config
+      (setq lsp-inlay-hint-enable t)
+      (setq lsp-rust-analyzer-inlay-hints-mode t)
+      (setq lsp-rust-analyzer-server-display-hints t)
+      (setq lsp-rust-analyzer-display-chaining-hints t)
+      (setq lsp-rust-analyzer-display-parameter-hints t)
+      )
+
+    (use-package lsp-ui
+      :straight t
+      :after lsp-mode
+      ;:custom
+      ;(lsp-ui-doc-use-childframe t)
+      ;(setq lsp-ui-doc-use-webkit t)
+  )
 #+end_src
 
 * Flymake
@@ -300,18 +313,19 @@ Helm with projectile
 
 * Treemacs
 #+begin_src elisp
-  (use-package treemacs
-    :defer t
-    :straight t)
+    (use-package treemacs
+      :defer t
+      :straight t
+  :config ())
 
-  (use-package treemacs-evil
-    :after treemacs
-    :straight t)
+    (use-package treemacs-evil
+      :after treemacs
+      :straight t)
 
-  (use-package treemacs-nerd-icons
-    :straight t
-    :config (treemacs-load-theme "nerd-icons")
-    )
+    (use-package treemacs-nerd-icons
+      :straight t
+      :config (setq treemacs-width 30)
+      )
 #+end_src
 
 * Projectile
