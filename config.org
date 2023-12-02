@@ -11,12 +11,12 @@
 this speeds up init time.
 it is set back to the original value at the end.
 #+begin_src emacs-lisp :tangle yes
-(setq gc-cons-threshold 10000000000)
+  (setq gc-cons-threshold 10000000000)
 #+end_src
 
 * Compile Elisp binaries JIT
 #+begin_src emacs-lisp :tangle yes
-(setq comp-deferred-compilation t)
+  (setq comp-deferred-compilation t)
 #+end_src
 
 * Cleanup the UI and Emacs weirdness
@@ -36,6 +36,9 @@ make visuals make sense and sound
 
   ; make warnings buffer only appear if there is an error
   (setq warning-minimum-level :error)
+
+  ; set line numbers
+  (add-hook 'prog-mode-hook (lambda () (display-line-numbers-mode) (setq display-line-numbers 'relative)))
 #+end_src
 
 make backups go to the current directory
@@ -249,10 +252,10 @@ Ripgrep with helm
 Helm with projectile
 #+begin_src elisp
   (use-package helm-projectile
-    :defer t
+    :after projectile
     :straight t
     :config
-    (define-key evil-normal-state-map (kbd "S-C-p") 'helm-projectile-rg)
+    (define-key evil-normal-state-map (kbd "S-C-P") 'helm-projectile-rg)
     )
 #+end_src
 

@@ -16,6 +16,9 @@
 ; make warnings buffer only appear if there is an error
 (setq warning-minimum-level :error)
 
+; set line numbers
+(add-hook 'prog-mode-hook (lambda () (display-line-numbers-mode) (setq display-line-numbers 'relative)))
+
 (setq backup-directory-alist `(("." . "~/.emacs.d/emacs_saves")))
 (setq backup-by-copying t)
 
@@ -165,10 +168,10 @@
   :straight t)
 
 (use-package helm-projectile
-  :defer t
+  :after projectile
   :straight t
   :config
-  (define-key evil-normal-state-map (kbd "S-C-p") 'helm-projectile-rg)
+  (define-key evil-normal-state-map (kbd "S-C-P") 'helm-projectile-rg)
   )
 
 (use-package ripgrep
