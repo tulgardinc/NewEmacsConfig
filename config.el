@@ -9,14 +9,14 @@
 (setq initial-scratch-message nil)
 (setq ring-bell-function 'ignore)
 
-; background
+					; background
 (set-frame-parameter nil 'alpha-background 60)
 (add-to-list 'default-frame-alist '(alpha-background . 60))
 
-; make warnings buffer only appear if there is an error
+					; make warnings buffer only appear if there is an error
 (setq warning-minimum-level :error)
 
-; set line numbers
+					; set line numbers
 (add-hook 'prog-mode-hook (lambda () (display-line-numbers-mode) (setq display-line-numbers 'relative)))
 
 (setq backup-directory-alist `(("." . "~/.emacs.d/emacs_saves")))
@@ -39,23 +39,6 @@
 
 (straight-use-package 'use-package)
 
-(use-package org
-  :straight t
-  :defer t
-  :config
-  (setq org-confirm-babel-evaluate nil)
-  (setq org-adapt-indentation t
-  	org-hide-leading-stars nil
-  	org-odd-levels-only t)
-  (setq org-superstar-leading-bullet ?\s)
-  (setq org-hide-emphasis-markers t)
-  )
-
-(use-package org-superstar
-  :straight t
-  :hook (org-mode . org-superstar-mode)
-  )
-
 (use-package evil
   :straight t
   :init
@@ -69,7 +52,6 @@
   (setq evil-split-window-below t)
   (evil-set-undo-system 'undo-tree)
 					; Keybinds
-  (evil-define-key 'normal org-mode-map (kbd "C-t") 'org-todo)
   )
 
 (use-package evil-collection
@@ -86,6 +68,31 @@
   :config
   (global-evil-surround-mode))
 
+(use-package org
+  :straight t
+  :defer t
+  :after evil
+  :config
+					;indents and bullets
+  (setq org-confirm-babel-evaluate nil)
+  (setq org-adapt-indentation t
+      	org-hide-leading-stars nil
+      	org-odd-levels-only t)
+  (setq org-hide-emphasis-markers t)
+					;pretty title
+  (set-face-attribute 'org-document-title nil :height 250)  
+  (set-face-attribute 'org-document-info-keyword nil :height 1)
+    					; keybinds
+  (evil-define-key 'normal org-mode-map (kbd "C-t") 'org-todo)
+  )
+
+(use-package org-superstar
+  :straight t
+  :defer t
+  :hook (org-mode . org-superstar-mode)
+  :config (setq org-superstar-leading-bullet ?\s)
+  )
+
 (use-package undo-tree
   :straight t
   :config
@@ -97,8 +104,8 @@
   :straight t
   :config
   (load-theme 'doom-moonlight t)
-  ;(setq doom-themes-treemacs-theme "moonlight")
-  ;(doom-themes-treemacs-config)
+					;(setq doom-themes-treemacs-theme "moonlight")
+					;(doom-themes-treemacs-config)
   (define-key evil-normal-state-map (kbd "C-f") 'treemacs)
   (doom-themes-org-config)
   )
@@ -114,7 +121,7 @@
   )
 
 (set-face-attribute 'default nil :family "JetBrainsMono Nerd Font" :height 110)
-;(set-face-attribute 'default nil :family "Ubuntu mono" :height 120)
+					;(set-face-attribute 'default nil :family "Ubuntu mono" :height 120)
 
 (use-package all-the-icons
   :straight t)
@@ -125,7 +132,7 @@
   (solaire-global-mode t)
   (push '(treemacs-window-background-face . solaire-default-face) solaire-mode-remap-alist)
   (push '(treemacs-hl-line-face . solaire-hl-line-face) solaire-mode-remap-alist)
-)
+  )
 
 (use-package lsp-mode
   :straight t
@@ -148,21 +155,20 @@
 
 (use-package helm
   :straight t
+  :after evil
   :config
   (helm-mode)
   (setq helm-split-window-in-side-p t)
-  (define-key evil-normal-state-map (kbd "C-b") #'helm-mini)
-  (define-key evil-normal-state-map (kbd "C-x C-f") 'helm-find-files)
-  :bind
-  (("M-x" . helm-M-x)
-   ("C-x C-f" . helm-find-files)
-   :map helm-map
-   ("<tab>" . helm-execute-persistent-action)
-   ("<C-backspace>" . backward-kill-word)
-   ("<escape>" . helm-keyboard-quit))
+  (evil-define-key 'normal 'global
+    (kbd "M-x") 'helm-M-x
+    (kbd "C-b") 'helm-mini
+    (kbd "C-x C-f") 'helm-find-files)
+  (evil-define-key nil helm-map
+    (kbd "<tab>")  'helm-execute-persistent-action
+    (kbd "<C-backspace>")  'backward-kill-word
+    (kbd "<escape>")  'helm-keyboard-quit)
   )
 
-  					; keep helm in place
 (use-package shackle
   :straight t
   :config
