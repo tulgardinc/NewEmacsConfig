@@ -2,14 +2,14 @@
 #+PROPERTY: header-args :tangle config.el :results none
 
 * Things to do
-** TODO Prettier headers
 ** TODO Nicer title
-** TODO Hide the leading *
+** TODO Look into Fixed pitch bullets
 
 * Plugins to look into
 - Zoom
 - Dirvish maybe in the future if dired is not good enough
 - Org roam
+- Org modern
 - ivy
 
 * Set garbage collector to a relaxed value
@@ -78,14 +78,21 @@ make backups go to the current directory
 #+end_src
 
 * Org mode
+*might need to switch back to org indent mode*
+if I ever want to use variable pitch fonts in org
+  
 #+begin_src elisp
   (use-package org
     :straight t
     :defer t
-    :hook (org-mode . org-indent-mode)
     :config
     (setq org-confirm-babel-evaluate nil)
-  )
+    (setq org-adapt-indentation t
+  	org-hide-leading-stars nil
+  	org-odd-levels-only nil)
+    (setq org-superstar-leading-bullet ?\s)
+    (setq org-hide-emphasis-markers t)
+    )
 
   (use-package org-superstar
     :straight t

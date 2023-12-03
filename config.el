@@ -42,10 +42,14 @@
 (use-package org
   :straight t
   :defer t
-  :hook (org-mode . org-indent-mode)
   :config
   (setq org-confirm-babel-evaluate nil)
-)
+  (setq org-adapt-indentation t
+	org-hide-leading-stars nil
+	org-odd-levels-only nil)
+  (setq org-superstar-leading-bullet ?\s)
+  (setq org-hide-emphasis-markers t)
+  )
 
 (use-package org-superstar
   :straight t
