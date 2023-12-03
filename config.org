@@ -4,7 +4,8 @@
 * Things to do
   I might also consider changing the theme
 *** TODO Look into Fixed pitch bullets
-   
+*** TODO Dap is broken
+    
 * Plugins to look into
   - Zoom
   - Dirvish maybe in the future if dired is not good enough
@@ -231,6 +232,35 @@
       :after lsp-mode)
   #+end_src
 
+* DAP debug
+  _inactive_
+  deugger for emacs that works with LSP mode
+  
+  #+begin_src emacs-lisp :tangle no
+    (use-package exec-path-from-shell
+      :straight t
+      :init (exec-path-from-shell-initialize))
+
+    					;(require 'dap-gdb-lldb)
+
+    (use-package dap-mode
+      :straight t
+      :after lsp-mode
+      :config
+      (require 'dap-gdb-lldb)
+      (dap-gdb-lldb-setup)
+      (dap-register-debug-template
+       "Rust POGGGG"
+       (list :type "lldb"
+             :request "launch"
+             :name "GDB::Run"
+          	 :gdbpath "rust-lldb"
+             :target nil
+             :cwd nil))
+      )
+
+  #+end_src
+
 * Flymake
   linter
   #+begin_src emacs-lisp :tangle yes
@@ -247,9 +277,11 @@
       :config
       (helm-mode)
       (setq helm-split-window-in-side-p t)
+      (setq helm-move-to-line-cycle-in-source nil)
       (evil-define-key 'normal 'global
         (kbd "M-x") 'helm-M-x
         (kbd "C-b") 'helm-mini
+        (kbd "S-C-b") 'helm-bookmarks
         (kbd "C-x C-f") 'helm-find-files)
       (evil-define-key nil helm-map
         (kbd "<tab>")  'helm-execute-persistent-action
@@ -349,9 +381,9 @@
   #+begin_src emacs-lisp 
     (use-package projectile
       :straight t
-      :defer t
+      :after evil
       :config
-      (define-key evil-normal-state-map (kbd "C-p") 'projectile-find-file)
+      (evil-global-set-key 'normal (kbd "C-p") 'helm-projectile)
       )
   #+end_src
 
@@ -404,11 +436,6 @@
 
 * Emacs custom dashboard
   #+begin_src emacs-lisp :tangle yes
-
-    					; needed to make work with the client
-    ;(defun setup-dashboard ()
-    ;  (dashboard-open))
-
     (use-package dashboard
       :straight t
       :config

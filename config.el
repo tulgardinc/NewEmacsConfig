@@ -159,9 +159,11 @@
   :config
   (helm-mode)
   (setq helm-split-window-in-side-p t)
+  (setq helm-move-to-line-cycle-in-source nil)
   (evil-define-key 'normal 'global
     (kbd "M-x") 'helm-M-x
     (kbd "C-b") 'helm-mini
+    (kbd "S-C-b") 'helm-bookmarks
     (kbd "C-x C-f") 'helm-find-files)
   (evil-define-key nil helm-map
     (kbd "<tab>")  'helm-execute-persistent-action
@@ -233,9 +235,9 @@
 
 (use-package projectile
   :straight t
-  :defer t
+  :after evil
   :config
-  (define-key evil-normal-state-map (kbd "C-p") 'projectile-find-file)
+  (evil-global-set-key 'normal (kbd "C-p") 'helm-projectile)
   )
 
 (use-package treemacs-projectile
@@ -265,10 +267,6 @@
   (org-mode . (lambda () (olivetti-mode) (olivetti-set-width 120)))
   (dashboard-mode . (lambda () (olivetti-mode) (olivetti-set-width 150)))
   )
-
-; needed to make work with the client
-;(defun setup-dashboard ()
-;  (dashboard-open))
 
 (use-package dashboard
   :straight t
