@@ -266,14 +266,18 @@
   (dashboard-mode . (lambda () (olivetti-mode) (olivetti-set-width 150)))
   )
 
+; needed to make work with the client
+;(defun setup-dashboard ()
+;  (dashboard-open))
+
 (use-package dashboard
   :straight t
   :config
   (dashboard-setup-startup-hook)
-  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+  (setq initial-buffer-choice 'dashboard-open)
+  (setq dashboard-image-banner-max-width 200)
   (setq dashboard-startup-banner "~/.emacs.d/Icon_Emacs.webp")
   (setq dashboard-display-icons-p t)
-  (setq dashboard-image-banner-max-width 200)
   (setq dashboard-icon-type 'nerd-icons)
   (setq dashboard-set-file-icons t)
   )
