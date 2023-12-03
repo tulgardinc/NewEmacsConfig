@@ -269,7 +269,12 @@
   :straight t
   :config
   (dashboard-setup-startup-hook)
-  (setq dashboard-startup-banner 'logo)
+  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+  (setq dashboard-startup-banner "~/.emacs.d/Icon_Emacs.webp")
+  (setq dashboard-display-icons-p t)
+  (setq dashboard-image-banner-max-width 200)
+  (setq dashboard-icon-type 'nerd-icons)
+  (setq dashboard-set-file-icons t)
   )
 
 (use-package bug-hunter
@@ -291,7 +296,7 @@
   )
 
 (defun go-home () (interactive)
-       (find-alternate-file "/home/ts"))
+       (find-alternate-file "~/"))
 
 (use-package dired-single
   :straight t
