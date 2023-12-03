@@ -214,18 +214,21 @@
   :defer t)
 
 (use-package treemacs
-    :defer t
-    :straight t
-:config ())
+  :defer t
+  :straight t
+  :config
+  (setq treemacs-width 30)
+  )
 
-  (use-package treemacs-evil
-    :after treemacs
-    :straight t)
+(use-package treemacs-evil
+  :after treemacs
+  :straight t)
 
-  (use-package treemacs-nerd-icons
-    :straight t
-    :config (setq treemacs-width 30)
-    )
+(use-package treemacs-nerd-icons
+  :straight t
+  :config 
+  (treemacs-load-theme "nerd-icons")
+  )
 
 (use-package projectile
   :straight t

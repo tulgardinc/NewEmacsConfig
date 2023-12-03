@@ -320,19 +320,22 @@ Helm with projectile
 
 * Treemacs
 #+begin_src elisp
-    (use-package treemacs
-      :defer t
-      :straight t
-  :config ())
+  (use-package treemacs
+    :defer t
+    :straight t
+    :config
+    (setq treemacs-width 30)
+    )
 
-    (use-package treemacs-evil
-      :after treemacs
-      :straight t)
+  (use-package treemacs-evil
+    :after treemacs
+    :straight t)
 
-    (use-package treemacs-nerd-icons
-      :straight t
-      :config (setq treemacs-width 30)
-      )
+  (use-package treemacs-nerd-icons
+    :straight t
+    :config 
+    (treemacs-load-theme "nerd-icons")
+    )
 #+end_src
 
 * Projectile
