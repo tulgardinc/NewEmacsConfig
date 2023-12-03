@@ -45,8 +45,8 @@
   :config
   (setq org-confirm-babel-evaluate nil)
   (setq org-adapt-indentation t
-	org-hide-leading-stars nil
-	org-odd-levels-only nil)
+  	org-hide-leading-stars nil
+  	org-odd-levels-only t)
   (setq org-superstar-leading-bullet ?\s)
   (setq org-hide-emphasis-markers t)
   )
@@ -62,11 +62,14 @@
   (setq evil-want-C-u-scroll t)
   (setq evil-want-keybinding nil)
   (setq evil-want-integration t)
+					;(setq evil-overriding-maps nil)
   :config
   (evil-mode)
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
   (evil-set-undo-system 'undo-tree)
+					; Keybinds
+  (evil-define-key 'normal org-mode-map (kbd "C-t") 'org-todo)
   )
 
 (use-package evil-collection
@@ -125,23 +128,19 @@
 )
 
 (use-package lsp-mode
-    :straight t
-    :defer t
-    :config
-    (setq lsp-inlay-hint-enable t)
-    (setq lsp-rust-analyzer-inlay-hints-mode t)
-    (setq lsp-rust-analyzer-server-display-hints t)
-    (setq lsp-rust-analyzer-display-chaining-hints t)
-    (setq lsp-rust-analyzer-display-parameter-hints t)
-    )
+  :straight t
+  :defer t
+  :config
+  (setq lsp-inlay-hint-enable t)
+  (setq lsp-rust-analyzer-inlay-hints-mode t)
+  (setq lsp-rust-analyzer-server-display-hints t)
+  (setq lsp-rust-analyzer-display-chaining-hints t)
+  (setq lsp-rust-analyzer-display-parameter-hints t)
+  )
 
-  (use-package lsp-ui
-    :straight t
-    :after lsp-mode
-    ;:custom
-    ;(lsp-ui-doc-use-childframe t)
-    ;(setq lsp-ui-doc-use-webkit t)
-)
+(use-package lsp-ui
+  :straight t
+  :after lsp-mode)
 
 (use-package flymake
   :straight t
@@ -185,10 +184,6 @@
   :config
   (define-key evil-normal-state-map (kbd "S-C-P") 'helm-projectile-rg)
   )
-
-(use-package ripgrep
-  :defer t
-  :straight t)
 
 (use-package rustic
   :straight t
