@@ -445,10 +445,11 @@ Display keybinds
               "q" 'kill-buffer-and-window
               "gh" 'go-home))
 
-  (use-package all-the-icons-dired
+  (use-package nerd-icons-dired
     :straight t
     :after dired
-    :hook (dired-mode . all-the-icons-dired-mode))
+    :hook (dired-mode . nerd-icons-dired-mode)
+    )
 
   (use-package dired-hide-dotfiles
     :straight t
