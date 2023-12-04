@@ -3,8 +3,8 @@
 
 * Things to do
   I might also consider changing the theme
-*** TODO Look into Fixed pitch bullets
 *** TODO Dap is broken
+*** TODO Add bindings to disable evil mode in eat char mode
     
 * Plugins to look into
   - Zoom
@@ -26,6 +26,12 @@
     (setq comp-deferred-compilation t)
   #+end_src
 
+* Set I/O related vars for speeds
+  #+begin_src emacs-lisp :tangle yes
+    (setq process-adaptive-read-buffering nil)
+    (setq read-process-output-max (* 4 1024 1024))
+  #+end_src
+  
 * Cleanup the UI and Emacs weirdness
   make visuals make sense and sound
 
@@ -152,6 +158,24 @@
       :hook (org-mode . org-superstar-mode)
       :config (setq org-superstar-leading-bullet ?\s)
       )
+  #+end_src
+
+  org roam for note taking
+  
+  #+begin_src emacs-lisp :tangle yes
+    (use-package org-roam
+      :straight t
+      :defer t
+      :custom
+      (org-roam-directory (file-truename "~/.emacs.d/org-files/"))
+      :config
+      (org-roam-db-autosync-mode)
+      (evil-global-set-key 'normal 
+    		       (kbd "C-c n f") 'org-roam-node-find)
+      (evil-define-key 'normal org-mode-map
+        (kbd "C-c n l") 'org-roam-buffer-toggle
+        (kbd "C-c n i") 'org-roam-node-insert)
+        )
   #+end_src
 
 * Undo tree
@@ -466,6 +490,24 @@
       (which-key-mode))
   #+end_src
 
+* EAT terminal emulator
+  #+begin_src emacs-lisp :tangle yes
+    (use-package eat
+      :straight (eat :type git
+        		 :host codeberg
+        		 :repo "akib/emacs-eat"
+        		 :files ("*.el" ("term" "term/*.el") "*.texi"
+        			 "*.ti" ("terminfo/e" "terminfo/e/*")
+        			 ("terminfo/65" "terminfo/65/*")
+        			 ("integration" "integration/*")
+        			 (:exclude ".dir-locals.el" "*-tests.el")))
+      :defer t
+      :config
+      (setq eat-enable-directory-tracking t)
+      )
+
+  #+end_src
+  
 * Dired
   #+begin_src emacs-lisp :tangle yes
     (use-package dired
@@ -475,19 +517,22 @@
       :custom
       (dired-listing-switches "-lagho --group-directories-first")
       (setq dired-dwim-target t)
-      )
+      :config
+      (evil-collection-define-key 'normal 'dired-mode-map
+        "h" 'dired-up-directory
+        "l" 'dired-find-file
+        "q" 'kill-buffer-and-window
+        "gh" 'go-home))
 
     (defun go-home () (interactive)
            (find-alternate-file "~/"))
 
-    (use-package dired-single
-      :straight t
-      :after dired
-      :config (evil-collection-define-key 'normal 'dired-mode-map
-                "h" 'dired-single-up-directory
-                "l" 'dired-single-buffer
-                "q" 'kill-buffer-and-window
-                "gh" 'go-home))
+    					;    (use-package dired-single
+    					;      :straight t
+    					;      :after dired
+    					;      :config (evil-collection-define-key 'normal 'dired-mode-map
+    					;                "h" 'dired-single-up-directory
+    					;                "l" 'dired-single-buffer)
 
     (use-package nerd-icons-dired
       :straight t

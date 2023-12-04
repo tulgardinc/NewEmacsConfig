@@ -2,6 +2,9 @@
 
 (setq comp-deferred-compilation t)
 
+(setq process-adaptive-read-buffering nil)
+(setq read-process-output-max (* 4 1024 1024))
+
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
@@ -92,6 +95,20 @@
   :hook (org-mode . org-superstar-mode)
   :config (setq org-superstar-leading-bullet ?\s)
   )
+
+(use-package org-roam
+  :straight t
+  :defer t
+  :custom
+  (org-roam-directory (file-truename "~/.emacs.d/org-files/"))
+  :config
+  (org-roam-db-autosync-mode)
+  (evil-global-set-key 'normal 
+		       (kbd "C-c n f") 'org-roam-node-find)
+  (evil-define-key 'normal org-mode-map
+    (kbd "C-c n l") 'org-roam-buffer-toggle
+    (kbd "C-c n i") 'org-roam-node-insert)
+    )
 
 (use-package undo-tree
   :straight t
@@ -289,6 +306,20 @@
   :config
   (which-key-mode))
 
+(use-package eat
+  :straight (eat :type git
+    		 :host codeberg
+    		 :repo "akib/emacs-eat"
+    		 :files ("*.el" ("term" "term/*.el") "*.texi"
+    			 "*.ti" ("terminfo/e" "terminfo/e/*")
+    			 ("terminfo/65" "terminfo/65/*")
+    			 ("integration" "integration/*")
+    			 (:exclude ".dir-locals.el" "*-tests.el")))
+  :defer t
+  :config
+  (setq eat-enable-directory-tracking t)
+  )
+
 (use-package dired
   :straight nil
   :defer t
@@ -296,19 +327,22 @@
   :custom
   (dired-listing-switches "-lagho --group-directories-first")
   (setq dired-dwim-target t)
-  )
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "h" 'dired-up-directory
+    "l" 'dired-find-file
+    "q" 'kill-buffer-and-window
+    "gh" 'go-home))
 
 (defun go-home () (interactive)
        (find-alternate-file "~/"))
 
-(use-package dired-single
-  :straight t
-  :after dired
-  :config (evil-collection-define-key 'normal 'dired-mode-map
-            "h" 'dired-single-up-directory
-            "l" 'dired-single-buffer
-            "q" 'kill-buffer-and-window
-            "gh" 'go-home))
+					;    (use-package dired-single
+					;      :straight t
+					;      :after dired
+					;      :config (evil-collection-define-key 'normal 'dired-mode-map
+					;                "h" 'dired-single-up-directory
+					;                "l" 'dired-single-buffer)
 
 (use-package nerd-icons-dired
   :straight t
