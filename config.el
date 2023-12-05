@@ -12,14 +12,14 @@
 (setq initial-scratch-message nil)
 (setq ring-bell-function 'ignore)
 
-					; background
+    					; background
 (set-frame-parameter nil 'alpha-background 60)
 (add-to-list 'default-frame-alist '(alpha-background . 60))
 
-					; make warnings buffer only appear if there is an error
+    					; make warnings buffer only appear if there is an error
 (setq warning-minimum-level :error)
 
-					; set line numbers
+    					; set line numbers
 (add-hook 'prog-mode-hook (lambda () (display-line-numbers-mode) (setq display-line-numbers 'relative)))
 
 (setq backup-directory-alist `(("." . "~/.emacs.d/emacs_saves")))
@@ -54,7 +54,7 @@
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
   (evil-set-undo-system 'undo-tree)
-					; Keybinds
+  (evil-define-key nil 'global (kbd "<escape>") 'keyboard-quit);  could cause a problem
   )
 
 (use-package evil-collection
@@ -75,6 +75,7 @@
   :straight t
   :defer t
   :after evil
+  :hook (org-mode . (lambda () (flyspell-mode) (flyspell-buffer)))
   :config
 					;indents and bullets
   (setq org-confirm-babel-evaluate nil)
@@ -98,11 +99,13 @@
 
 (use-package org-roam
   :straight t
-  :defer t
   :custom
   (org-roam-directory (file-truename "~/.emacs.d/org-files/"))
   :config
   (org-roam-db-autosync-mode)
+  (setq org-roam-node-display-template
+		(concat "${title:*} "
+			(propertize "${tags:10}" 'face 'org-tag)))
   (evil-global-set-key 'normal 
 		       (kbd "C-c n f") 'org-roam-node-find)
   (evil-define-key 'normal org-mode-map
@@ -308,15 +311,17 @@
 
 (use-package eat
   :straight (eat :type git
-    		 :host codeberg
-    		 :repo "akib/emacs-eat"
-    		 :files ("*.el" ("term" "term/*.el") "*.texi"
-    			 "*.ti" ("terminfo/e" "terminfo/e/*")
-    			 ("terminfo/65" "terminfo/65/*")
-    			 ("integration" "integration/*")
-    			 (:exclude ".dir-locals.el" "*-tests.el")))
-  :defer t
+                 :host codeberg
+                 :repo "akib/emacs-eat"
+                 :files ("*.el" ("term" "term/*.el") "*.texi"
+                         "*.ti" ("terminfo/e" "terminfo/e/*")
+                         ("terminfo/65" "terminfo/65/*")
+                         ("integration" "integration/*")
+                         (:exclude ".dir-locals.el" "*-tests.el")))
   :config
+  (add-hook 'eat--char-mode-hook 'turn-off-evil-mode)
+  (add-hook 'eat--semi-char-mode-hook 'turn-on-evil-mode)
+  (evil-define-key nil eat-semi-char-mode-map (kbd "M-<return>") 'eat-char-mode)
   (setq eat-enable-directory-tracking t)
   )
 
