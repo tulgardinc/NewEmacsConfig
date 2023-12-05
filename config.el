@@ -104,14 +104,30 @@
   :config
   (org-roam-db-autosync-mode)
   (setq org-roam-node-display-template
-		(concat "${title:*} "
-			(propertize "${tags:10}" 'face 'org-tag)))
+	(concat "${title:*} "
+		(propertize "${tags:10}" 'face 'org-tag)))
+  (defun find-org-notes ()
+    "function to quickly sort through notes using ripgrep"
+    (interactive)
+    (let ((helm-rg--paths-to-search '("~/.emacs.d/org-files/")))
+      (call-interactively (helm-rg "")))
+    )
+
+  (evil-global-set-key 'normal 
+		       (kbd "C-c r f") 'find-org-notes)
   (evil-global-set-key 'normal 
 		       (kbd "C-c n f") 'org-roam-node-find)
   (evil-define-key 'normal org-mode-map
     (kbd "C-c n l") 'org-roam-buffer-toggle
     (kbd "C-c n i") 'org-roam-node-insert)
-    )
+  )
+
+(use-package org-download
+  :straight t
+  :after org
+  :config 
+  (setq-default org-download-image-dir "~/.emacs.d/org-files/images")
+  )
 
 (use-package undo-tree
   :straight t
