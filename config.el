@@ -1,9 +1,26 @@
-(setq gc-cons-threshold 10000000000)
+(setq gc-cons-threshold 1000000000)
 
 (setq comp-deferred-compilation t)
 
 (setq process-adaptive-read-buffering nil)
 (setq read-process-output-max (* 4 1024 1024))
+
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 6))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+	(url-retrieve-synchronously
+	 "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+	 'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+(setq package-enable-at-startup nil)
+
+(straight-use-package 'use-package)
 
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
@@ -25,22 +42,8 @@
 (setq backup-directory-alist `(("." . "~/.emacs.d/emacs_saves")))
 (setq backup-by-copying t)
 
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 6))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-	(url-retrieve-synchronously
-	 "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-	 'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
-(setq package-enable-at-startup nil)
-
-(straight-use-package 'use-package)
+(set-face-attribute 'default nil :family "JetBrainsMono Nerd Font" :height 110)
+					;(set-face-attribute 'default nil :family "Ubuntu mono" :height 120)
 
 (use-package evil
   :straight t
@@ -48,9 +51,9 @@
   (setq evil-want-C-u-scroll t)
   (setq evil-want-keybinding nil)
   (setq evil-want-integration t)
-					;(setq evil-overriding-maps nil)
   :config
   (evil-mode)
+  (electric-pair-mode) ; complete paranthesis and quotes
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
   (evil-set-undo-system 'undo-tree)
@@ -73,20 +76,19 @@
 
 (use-package org
   :straight t
-  :defer t
   :after evil
-  :hook (org-mode . (lambda () (flyspell-mode) (flyspell-buffer)))
+  :hook
+  (org-mode . (lambda () (flyspell-mode) (flyspell-buffer)))
+  (org-mode . org-indent-mode)
+  (org-mode . org-display-inline-images)
   :config
-					;indents and bullets
+    					;indents and bullets
   (setq org-confirm-babel-evaluate nil)
-  (setq org-adapt-indentation t
-      	org-hide-leading-stars nil
-      	org-odd-levels-only t)
   (setq org-hide-emphasis-markers t)
-					;pretty title
+    					;pretty title
   (set-face-attribute 'org-document-title nil :height 250)  
   (set-face-attribute 'org-document-info-keyword nil :height 1)
-    					; keybinds
+  					  				; keybinds
   (evil-define-key 'normal org-mode-map (kbd "C-t") 'org-todo)
   )
 
@@ -114,7 +116,7 @@
     )
 
   (evil-global-set-key 'normal 
-		       (kbd "C-c r f") 'find-org-notes)
+		       (kbd "C-c n r") 'find-org-notes)
   (evil-global-set-key 'normal 
 		       (kbd "C-c n f") 'org-roam-node-find)
   (evil-define-key 'normal org-mode-map
@@ -142,7 +144,7 @@
   (load-theme 'doom-moonlight t)
 					;(setq doom-themes-treemacs-theme "moonlight")
 					;(doom-themes-treemacs-config)
-  (define-key evil-normal-state-map (kbd "C-f") 'treemacs)
+  (evil-define-key 'normal 'global (kbd "C-f") 'treemacs)
   (doom-themes-org-config)
   )
 
@@ -155,9 +157,6 @@
   (setq doom-modeline-battery t)
   (setq doom-modeline-time t)
   )
-
-(set-face-attribute 'default nil :family "JetBrainsMono Nerd Font" :height 110)
-					;(set-face-attribute 'default nil :family "Ubuntu mono" :height 120)
 
 (use-package all-the-icons
   :straight t)
@@ -173,21 +172,48 @@
 (use-package lsp-mode
   :straight t
   :defer t
+  :after evil
   :config
   (setq lsp-inlay-hint-enable t)
   (setq lsp-rust-analyzer-inlay-hints-mode t)
   (setq lsp-rust-analyzer-server-display-hints t)
   (setq lsp-rust-analyzer-display-chaining-hints t)
   (setq lsp-rust-analyzer-display-parameter-hints t)
+  (setq lsp-modeline-diagnostics-scope :workspace)
+  ;(evil-define-key 'normal 'prog-mode-map (kbd "<f2>") 'lsp-rename)
+  (evil-define-key 'normal 'lsp-mode-map (kbd "<f2>") 'lsp-rename)
+  (evil-define-key 'normal 'lsp-mode-map (kbd "M-<return>") 'lsp-execute-code-action)
   )
 
 (use-package lsp-ui
   :straight t
-  :after lsp-mode)
+  :after lsp-mode
+  :defer t
+  :config
+  (setq lsp-ui-doc-enable t)
+  (setq lsp-ui-doc-show-with-cursor t)
+  (setq lsp-ui-sideline-enable nil)
+  (setq lsp-ui-doc-delay 1.5)
+  )
 
-(use-package flymake
+(use-package company
   :straight t
-  :hook (emacs-lisp-mode . flymake-mode))
+  :defer t
+  :hook (emacs-lisp-mode . company-mode)
+  :config
+  (global-company-mode)
+  (setq company-minimum-prefix-length 1)
+  (setq company-idle-delay 0.1)
+  )
+
+(use-package rustic
+  :straight t
+  :defer t
+  )
+
+(use-package flycheck
+  :straight t
+  :hook (emacs-lisp-mode . flycheck-mode))
 
 (use-package helm
   :straight t
@@ -196,8 +222,8 @@
   (helm-mode)
   (setq helm-split-window-in-side-p t)
   (setq helm-move-to-line-cycle-in-source nil)
+  (evil-define-key nil 'global (kbd "M-x") 'helm-M-x)
   (evil-define-key 'normal 'global
-    (kbd "M-x") 'helm-M-x
     (kbd "C-b") 'helm-mini
     (kbd "S-C-b") 'helm-bookmarks
     (kbd "C-x C-f") 'helm-find-files)
@@ -229,19 +255,6 @@
   (define-key evil-normal-state-map (kbd "S-C-P") 'helm-projectile-rg)
   )
 
-(use-package rustic
-  :straight t
-  :defer t
-  )
-
-(use-package company
-  :straight t
-  :defer t
-  :hook (emacs-lisp-mode . company-mode)
-  :config
-  (global-company-mode)
-  )
-
 (use-package yasnippet
   :straight t
   :config
@@ -267,6 +280,11 @@
   :straight t
   :config 
   (treemacs-load-theme "nerd-icons")
+  )
+
+(use-package lsp-treemacs
+  :straight t
+  :after lsp-mode
   )
 
 (use-package projectile
@@ -325,6 +343,12 @@
   :config
   (which-key-mode))
 
+(defun kill-buffer-and-delete-window-if-last ()
+  (kill-buffer)
+  (if (not (= 1 (length (window-list))))
+      (delete-window))
+  )
+
 (use-package eat
   :straight (eat :type git
                  :host codeberg
@@ -337,6 +361,7 @@
   :config
   (add-hook 'eat--char-mode-hook 'turn-off-evil-mode)
   (add-hook 'eat--semi-char-mode-hook 'turn-on-evil-mode)
+  (add-hook 'eat-exit-hook (lambda (val) (turn-on-evil-mode) (kill-buffer-and-delete-window-if-last)))
   (evil-define-key nil eat-semi-char-mode-map (kbd "M-<return>") 'eat-char-mode)
   (setq eat-enable-directory-tracking t)
   )
@@ -378,4 +403,6 @@
   (evil-collection-define-key 'normal 'dired-mode-map
     "H" 'dired-hide-dotfiles-mode))
 
-(setq gc-cons-threshold 800000)
+(setq garbage-collection-messages t) ; for debugging gc
+(setq gc-cons-threshold 8000000) 
+; default (setq gc-cons-threshold 800000)

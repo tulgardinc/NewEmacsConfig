@@ -2,579 +2,610 @@
 #+PROPERTY: header-args :tangle config.el :results none
 
 * Things to do
-  I might also consider changing the theme
-*** TODO Dap is broken
-*** TODO Look into Vterm
+I might also consider changing the theme
+** TODO Dap is broken
+** TODO Look into Vterm
     
 * Plugins to look into
-  - Zoom
-  - Dirvish maybe in the future if dired is not good enough
-  - Ivy
+- Zoom
+- Ivy
 
 * Set garbage collector to a relaxed value
-  this speeds up init time.
-  it is set back to the original value at the end.
+this speeds up init time.
+it is set back to the original value at the end.
 
-  #+begin_src emacs-lisp :tangle yes
-    (setq gc-cons-threshold 10000000000)
-  #+end_src
+#+begin_src emacs-lisp :tangle yes
+  (setq gc-cons-threshold 1000000000)
+#+end_src
 
 * Compile Elisp binaries JIT
-  #+begin_src emacs-lisp :tangle yes
-    (setq comp-deferred-compilation t)
-  #+end_src
+#+begin_src emacs-lisp :tangle yes
+  (setq comp-deferred-compilation t)
+#+end_src
 
 * Set I/O related vars for speeds
-  #+begin_src emacs-lisp :tangle yes
-    (setq process-adaptive-read-buffering nil)
-    (setq read-process-output-max (* 4 1024 1024))
-  #+end_src
+#+begin_src emacs-lisp :tangle yes
+  (setq process-adaptive-read-buffering nil)
+  (setq read-process-output-max (* 4 1024 1024))
+#+end_src
   
-* Cleanup the UI and Emacs weirdness
-  make visuals make sense and sound
-
-  #+begin_src elisp
-    (menu-bar-mode -1)
-    (scroll-bar-mode -1)
-    (tool-bar-mode -1)
-    (setq inhibit-startup-screen t)
-    (setq initial-scratch-message nil)
-    (setq ring-bell-function 'ignore)
-
-        					; background
-    (set-frame-parameter nil 'alpha-background 60)
-    (add-to-list 'default-frame-alist '(alpha-background . 60))
-
-        					; make warnings buffer only appear if there is an error
-    (setq warning-minimum-level :error)
-
-        					; set line numbers
-    (add-hook 'prog-mode-hook (lambda () (display-line-numbers-mode) (setq display-line-numbers 'relative)))
-
-  #+end_src
-
-  make backups go to the current directory
-
-  #+begin_src elisp
-    (setq backup-directory-alist `(("." . "~/.emacs.d/emacs_saves")))
-    (setq backup-by-copying t)
-  #+end_src
-
 * Setup Straight
-  #+begin_src elisp
-    (defvar bootstrap-version)
-    (let ((bootstrap-file
-           (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-          (bootstrap-version 6))
-      (unless (file-exists-p bootstrap-file)
-        (with-current-buffer
-    	(url-retrieve-synchronously
-    	 "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-   	 'silent 'inhibit-cookies)
-          (goto-char (point-max))
-          (eval-print-last-sexp)))
-      (load bootstrap-file nil 'nomessage))
+#+begin_src elisp
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 6))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+  	(url-retrieve-synchronously
+  	 "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+  	 'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
 
-    (setq package-enable-at-startup nil)
+  (setq package-enable-at-startup nil)
 
-  #+end_src
+#+end_src
 
 * Get use-package
-  #+begin_src elisp
-    (straight-use-package 'use-package)
-  #+end_src
+#+begin_src elisp
+  (straight-use-package 'use-package)
+#+end_src
 
-* Evil Mode
-  #+begin_src elisp
-    (use-package evil
-      :straight t
-      :init
-      (setq evil-want-C-u-scroll t)
-      (setq evil-want-keybinding nil)
-      (setq evil-want-integration t)
-    					;(setq evil-overriding-maps nil)
-      :config
-      (evil-mode)
-      (setq evil-vsplit-window-right t)
-      (setq evil-split-window-below t)
-      (evil-set-undo-system 'undo-tree)
-      (evil-define-key nil 'global (kbd "<escape>") 'keyboard-quit);  could cause a problem
-      )
-  #+end_src
+* Cleanup the UI and Emacs weirdness
+make visuals make sense and sound
 
-  and evil collection for many other modes
+#+begin_src elisp
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (setq inhibit-startup-screen t)
+  (setq initial-scratch-message nil)
+  (setq ring-bell-function 'ignore)
 
-  #+begin_src elisp
-    (use-package evil-collection
-      :straight t
-      :after evil
-      :custom (evil-collection-setup-minibuffer t)
-      :config
-      (evil-collection-init)
-      )
-  #+end_src
+      					; background
+  (set-frame-parameter nil 'alpha-background 60)
+  (add-to-list 'default-frame-alist '(alpha-background . 60))
 
-  evil surround
+      					; make warnings buffer only appear if there is an error
+  (setq warning-minimum-level :error)
 
-  #+begin_src emacs-lisp :tangle yes
-    (use-package evil-surround
-      :straight t 
-      :after evil
-      :config
-      (global-evil-surround-mode))
-  #+end_src
+      					; set line numbers
+  (add-hook 'prog-mode-hook (lambda () (display-line-numbers-mode) (setq display-line-numbers 'relative)))
 
-* Org mode
-  *might need to switch back to org indent mode*
-  if I ever want to use variable pitch fonts in org
-  
-  #+begin_src elisp
-    (use-package org
-      :straight t
-      :defer t
-      :after evil
-      :hook (org-mode . (lambda () (flyspell-mode) (flyspell-buffer)))
-      :config
-    					;indents and bullets
-      (setq org-confirm-babel-evaluate nil)
-      (setq org-adapt-indentation t
-          	org-hide-leading-stars nil
-          	org-odd-levels-only t)
-      (setq org-hide-emphasis-markers t)
-    					;pretty title
-      (set-face-attribute 'org-document-title nil :height 250)  
-      (set-face-attribute 'org-document-info-keyword nil :height 1)
-        					; keybinds
-      (evil-define-key 'normal org-mode-map (kbd "C-t") 'org-todo)
-      )
-  #+end_src
+#+end_src
 
-  org superstar for bullets
+make backups go to the current directory
 
-  #+begin_src emacs-lisp :tangle yes
-    (use-package org-superstar
-      :straight t
-      :defer t
-      :hook (org-mode . org-superstar-mode)
-      :config (setq org-superstar-leading-bullet ?\s)
-      )
-  #+end_src
-
-  org roam for zettlekasten note taking
-  
-  #+begin_src emacs-lisp :tangle yes
-    (use-package org-roam
-      :straight t
-      :custom
-      (org-roam-directory (file-truename "~/.emacs.d/org-files/"))
-      :config
-      (org-roam-db-autosync-mode)
-      (setq org-roam-node-display-template
-    	(concat "${title:*} "
-    		(propertize "${tags:10}" 'face 'org-tag)))
-      (defun find-org-notes ()
-        "function to quickly sort through notes using ripgrep"
-        (interactive)
-        (let ((helm-rg--paths-to-search '("~/.emacs.d/org-files/")))
-          (call-interactively (helm-rg "")))
-        )
-
-      (evil-global-set-key 'normal 
-    		       (kbd "C-c r f") 'find-org-notes)
-      (evil-global-set-key 'normal 
-    		       (kbd "C-c n f") 'org-roam-node-find)
-      (evil-define-key 'normal org-mode-map
-        (kbd "C-c n l") 'org-roam-buffer-toggle
-        (kbd "C-c n i") 'org-roam-node-insert)
-      )
-  #+end_src
-
-  drag and drop images into org
-
-  #+begin_src emacs-lisp :tangle yes
-    (use-package org-download
-      :straight t
-      :after org
-      :config 
-      (setq-default org-download-image-dir "~/.emacs.d/org-files/images")
-      )
-  #+end_src
-
-* Undo tree
-  #+begin_src emacs-lisp :tangle yes
-    (use-package undo-tree
-      :straight t
-      :config
-      (global-undo-tree-mode)
-      (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo_tree_files")))
-      )
-  #+end_src
-
-* Doom Themes
-  #+begin_src elisp
-    (use-package doom-themes
-      :straight t
-      :config
-      (load-theme 'doom-moonlight t)
-    					;(setq doom-themes-treemacs-theme "moonlight")
-    					;(doom-themes-treemacs-config)
-      (define-key evil-normal-state-map (kbd "C-f") 'treemacs)
-      (doom-themes-org-config)
-      )
-  #+end_src
-
-* Doom modeline
-  #+begin_src elisp
-    (use-package doom-modeline
-      :straight t
-      :config
-      (doom-modeline-mode)
-      (display-time)
-      (display-battery-mode)
-      (setq doom-modeline-battery t)
-      (setq doom-modeline-time t)
-      )
-  #+end_src
+#+begin_src elisp
+  (setq backup-directory-alist `(("." . "~/.emacs.d/emacs_saves")))
+  (setq backup-by-copying t)
+#+end_src
 
 * Set font
-  #+begin_src emacs-lisp :tangle yes
-    (set-face-attribute 'default nil :family "JetBrainsMono Nerd Font" :height 110)
-    					;(set-face-attribute 'default nil :family "Ubuntu mono" :height 120)
-  #+end_src
+#+begin_src emacs-lisp :tangle yes
+  (set-face-attribute 'default nil :family "JetBrainsMono Nerd Font" :height 110)
+  					;(set-face-attribute 'default nil :family "Ubuntu mono" :height 120)
+#+end_src
+
+* Evil Mode
+#+begin_src elisp
+  (use-package evil
+    :straight t
+    :init
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-keybinding nil)
+    (setq evil-want-integration t)
+    :config
+    (evil-mode)
+    (electric-pair-mode) ; complete paranthesis and quotes
+    (setq evil-vsplit-window-right t)
+    (setq evil-split-window-below t)
+    (evil-set-undo-system 'undo-tree)
+    (evil-define-key nil 'global (kbd "<escape>") 'keyboard-quit);  could cause a problem
+    )
+#+end_src
+
+and evil collection for many other modes
+
+#+begin_src elisp
+  (use-package evil-collection
+    :straight t
+    :after evil
+    :custom (evil-collection-setup-minibuffer t)
+    :config
+    (evil-collection-init)
+    )
+#+end_src
+
+evil surround
+
+#+begin_src emacs-lisp :tangle yes
+  (use-package evil-surround
+    :straight t 
+    :after evil
+    :config
+    (global-evil-surround-mode))
+#+end_src
+
+* Org mode
+*might need to switch back to org indent mode*
+if I ever want to use variable pitch fonts in org
+
+I customized org-indent mode that might break since I don't
+understand how straight works.
+  
+#+begin_src elisp
+  (use-package org
+    :straight t
+    :after evil
+    :hook
+    (org-mode . (lambda () (flyspell-mode) (flyspell-buffer)))
+    (org-mode . org-indent-mode)
+    (org-mode . org-display-inline-images)
+    :config
+      					;indents and bullets
+    (setq org-confirm-babel-evaluate nil)
+    (setq org-hide-emphasis-markers t)
+      					;pretty title
+    (set-face-attribute 'org-document-title nil :height 250)  
+    (set-face-attribute 'org-document-info-keyword nil :height 1)
+    					  				; keybinds
+    (evil-define-key 'normal org-mode-map (kbd "C-t") 'org-todo)
+    )
+#+end_src
+
+org superstar for bullets
+
+#+begin_src emacs-lisp :tangle yes
+  (use-package org-superstar
+    :straight t
+    :defer t
+    :hook (org-mode . org-superstar-mode)
+    :config (setq org-superstar-leading-bullet ?\s)
+    )
+#+end_src
+
+org roam for zettlekasten note taking
+  
+#+begin_src emacs-lisp :tangle yes
+  (use-package org-roam
+    :straight t
+    :custom
+    (org-roam-directory (file-truename "~/.emacs.d/org-files/"))
+    :config
+    (org-roam-db-autosync-mode)
+    (setq org-roam-node-display-template
+  	(concat "${title:*} "
+  		(propertize "${tags:10}" 'face 'org-tag)))
+    (defun find-org-notes ()
+      "function to quickly sort through notes using ripgrep"
+      (interactive)
+      (let ((helm-rg--paths-to-search '("~/.emacs.d/org-files/")))
+        (call-interactively (helm-rg "")))
+      )
+
+    (evil-global-set-key 'normal 
+  		       (kbd "C-c n r") 'find-org-notes)
+    (evil-global-set-key 'normal 
+  		       (kbd "C-c n f") 'org-roam-node-find)
+    (evil-define-key 'normal org-mode-map
+      (kbd "C-c n l") 'org-roam-buffer-toggle
+      (kbd "C-c n i") 'org-roam-node-insert)
+    )
+#+end_src
+
+drag and drop images into org
+
+#+begin_src emacs-lisp :tangle yes
+  (use-package org-download
+    :straight t
+    :after org
+    :config 
+    (setq-default org-download-image-dir "~/.emacs.d/org-files/images")
+    )
+#+end_src
+
+* Undo tree
+#+begin_src emacs-lisp :tangle yes
+  (use-package undo-tree
+    :straight t
+    :config
+    (global-undo-tree-mode)
+    (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo_tree_files")))
+    )
+#+end_src
+
+* Doom Themes
+#+begin_src elisp
+  (use-package doom-themes
+    :straight t
+    :config
+    (load-theme 'doom-moonlight t)
+  					;(setq doom-themes-treemacs-theme "moonlight")
+  					;(doom-themes-treemacs-config)
+    (evil-define-key 'normal 'global (kbd "C-f") 'treemacs)
+    (doom-themes-org-config)
+    )
+#+end_src
+
+* Doom modeline
+#+begin_src elisp
+  (use-package doom-modeline
+    :straight t
+    :config
+    (doom-modeline-mode)
+    (display-time)
+    (display-battery-mode)
+    (setq doom-modeline-battery t)
+    (setq doom-modeline-time t)
+    )
+#+end_src
 
 * All the icons
-  #+begin_src elisp
-    (use-package all-the-icons
-      :straight t)
-  #+end_src
+#+begin_src elisp
+  (use-package all-the-icons
+    :straight t)
+#+end_src
 
 * Setup Solaire
-  Make unimportant buffers darker
-  #+begin_src elisp
-    (use-package solaire-mode
-      :straight t
-      :config
-      (solaire-global-mode t)
-      (push '(treemacs-window-background-face . solaire-default-face) solaire-mode-remap-alist)
-      (push '(treemacs-hl-line-face . solaire-hl-line-face) solaire-mode-remap-alist)
-      )
-  #+end_src
+Make unimportant buffers darker
+#+begin_src elisp
+  (use-package solaire-mode
+    :straight t
+    :config
+    (solaire-global-mode t)
+    (push '(treemacs-window-background-face . solaire-default-face) solaire-mode-remap-alist)
+    (push '(treemacs-hl-line-face . solaire-hl-line-face) solaire-mode-remap-alist)
+    )
+#+end_src
 
-* Lsp-mode
-  #+begin_src elisp
-    (use-package lsp-mode
-      :straight t
-      :defer t
-      :config
-      (setq lsp-inlay-hint-enable t)
-      (setq lsp-rust-analyzer-inlay-hints-mode t)
-      (setq lsp-rust-analyzer-server-display-hints t)
-      (setq lsp-rust-analyzer-display-chaining-hints t)
-      (setq lsp-rust-analyzer-display-parameter-hints t)
-      )
+* LSP-mode
+#+begin_src elisp
+  (use-package lsp-mode
+    :straight t
+    :defer t
+    :after evil
+    :config
+    (setq lsp-inlay-hint-enable t)
+    (setq lsp-rust-analyzer-inlay-hints-mode t)
+    (setq lsp-rust-analyzer-server-display-hints t)
+    (setq lsp-rust-analyzer-display-chaining-hints t)
+    (setq lsp-rust-analyzer-display-parameter-hints t)
+    (setq lsp-modeline-diagnostics-scope :workspace)
+    ;(evil-define-key 'normal 'prog-mode-map (kbd "<f2>") 'lsp-rename)
+    (evil-define-key 'normal 'lsp-mode-map (kbd "<f2>") 'lsp-rename)
+    (evil-define-key 'normal 'lsp-mode-map (kbd "M-<return>") 'lsp-execute-code-action)
+    )
 
-    (use-package lsp-ui
-      :straight t
-      :after lsp-mode)
-  #+end_src
+  (use-package lsp-ui
+    :straight t
+    :after lsp-mode
+    :defer t
+    :config
+    (setq lsp-ui-doc-enable t)
+    (setq lsp-ui-doc-show-with-cursor t)
+    (setq lsp-ui-sideline-enable nil)
+    (setq lsp-ui-doc-delay 1.5)
+    )
 
-* DAP debug
-  _inactive_
-  deugger for emacs that works with LSP mode
-  
-  #+begin_src emacs-lisp :tangle no
-    (use-package exec-path-from-shell
-      :straight t
-      :init (exec-path-from-shell-initialize))
-
-    					;(require 'dap-gdb-lldb)
-
-    (use-package dap-mode
-      :straight t
-      :after lsp-mode
-      :config
-      (require 'dap-gdb-lldb)
-      (dap-gdb-lldb-setup)
-      (dap-register-debug-template
-       "Rust POGGGG"
-       (list :type "lldb"
-             :request "launch"
-             :name "GDB::Run"
-          	 :gdbpath "rust-lldb"
-             :target nil
-             :cwd nil))
-      )
-
-  #+end_src
-
-* Flymake
-  linter
-  #+begin_src emacs-lisp :tangle yes
-    (use-package flymake
-      :straight t
-      :hook (emacs-lisp-mode . flymake-mode))
-  #+end_src
-
-* Helm
-  #+begin_src elisp
-    (use-package helm
-      :straight t
-      :after evil
-      :config
-      (helm-mode)
-      (setq helm-split-window-in-side-p t)
-      (setq helm-move-to-line-cycle-in-source nil)
-      (evil-define-key 'normal 'global
-        (kbd "M-x") 'helm-M-x
-        (kbd "C-b") 'helm-mini
-        (kbd "S-C-b") 'helm-bookmarks
-        (kbd "C-x C-f") 'helm-find-files)
-      (evil-define-key nil helm-map
-        (kbd "<tab>")  'helm-execute-persistent-action
-        (kbd "<C-backspace>")  'backward-kill-word
-        (kbd "<escape>")  'helm-keyboard-quit)
-      )
-  #+end_src
-
-  Make helm appear in the bottom
-
-  #+begin_src emacs-lisp :tangle yes
-    (use-package shackle
-      :straight t
-      :config
-      (shackle-mode)
-      (setq shackle-rules '(("\\`\\*helm.*?\\*\\'" :regexp t :align t :ratio 0.4)))
-      )
-  #+end_src
-
-  helm for LSP
-  #+begin_src elisp
-    (use-package helm-lsp
-      :defer t
-      :straight t)
-  #+end_src
-
-  Ripgrep with helm
-  #+begin_src elisp
-    (use-package helm-rg
-      :defer t
-      :straight t)
-  #+end_src
-
-  Helm with projectile
-  #+begin_src elisp
-    (use-package helm-projectile
-      :after projectile
-      :straight t
-      :config
-      (define-key evil-normal-state-map (kbd "S-C-P") 'helm-projectile-rg)
-      )
-  #+end_src
-
-* Rustic for rust
-  #+begin_src elisp
-    (use-package rustic
-      :straight t
-      :defer t
-      )
-  #+end_src
+#+end_src
 
 * Company mode
-  #+begin_src elisp
-    (use-package company
-      :straight t
-      :defer t
-      :hook (emacs-lisp-mode . company-mode)
-      :config
-      (global-company-mode)
-      ) 
-  #+end_src
+#+begin_src elisp
+  (use-package company
+    :straight t
+    :defer t
+    :hook (emacs-lisp-mode . company-mode)
+    :config
+    (global-company-mode)
+    (setq company-minimum-prefix-length 1)
+    (setq company-idle-delay 0.1)
+    ) 
+#+end_src
+
+* DAP debug
+_inactive_
+deugger for emacs that works with LSP mode
+  
+#+begin_src emacs-lisp :tangle no
+  (use-package exec-path-from-shell
+    :straight t
+    :init (exec-path-from-shell-initialize))
+
+  					;(require 'dap-gdb-lldb)
+
+  (use-package dap-mode
+    :straight t
+    :after lsp-mode
+    :config
+    (require 'dap-gdb-lldb)
+    (dap-gdb-lldb-setup)
+    (dap-register-debug-template
+     "Rust POGGGG"
+     (list :type "lldb"
+           :request "launch"
+           :name "GDB::Run"
+        	 :gdbpath "rust-lldb"
+           :target nil
+           :cwd nil))
+    )
+
+#+end_src
+
+* Rustic for rust
+#+begin_src elisp
+  (use-package rustic
+    :straight t
+    :defer t
+    )
+#+end_src
+
+* Flycheck
+linter
+#+begin_src emacs-lisp :tangle yes
+  (use-package flycheck
+    :straight t
+    :hook (emacs-lisp-mode . flycheck-mode))
+#+end_src
+
+* Helm
+#+begin_src elisp
+  (use-package helm
+    :straight t
+    :after evil
+    :config
+    (helm-mode)
+    (setq helm-split-window-in-side-p t)
+    (setq helm-move-to-line-cycle-in-source nil)
+    (evil-define-key nil 'global (kbd "M-x") 'helm-M-x)
+    (evil-define-key 'normal 'global
+      (kbd "C-b") 'helm-mini
+      (kbd "S-C-b") 'helm-bookmarks
+      (kbd "C-x C-f") 'helm-find-files)
+    (evil-define-key nil helm-map
+      (kbd "<tab>")  'helm-execute-persistent-action
+      (kbd "<C-backspace>")  'backward-kill-word
+      (kbd "<escape>")  'helm-keyboard-quit)
+    )
+#+end_src
+
+Make helm appear in the bottom
+
+#+begin_src emacs-lisp :tangle yes
+  (use-package shackle
+    :straight t
+    :config
+    (shackle-mode)
+    (setq shackle-rules '(("\\`\\*helm.*?\\*\\'" :regexp t :align t :ratio 0.4)))
+    )
+#+end_src
+
+helm for LSP
+#+begin_src elisp
+  (use-package helm-lsp
+    :defer t
+    :straight t)
+#+end_src
+
+Ripgrep with helm
+
+#+begin_src elisp
+  (use-package helm-rg
+    :defer t
+    :straight t)
+#+end_src
+
+Helm with projectile
+
+#+begin_src elisp
+  (use-package helm-projectile
+    :after projectile
+    :straight t
+    :config
+    (define-key evil-normal-state-map (kbd "S-C-P") 'helm-projectile-rg)
+    )
+#+end_src
 
 * Yasnippet (snippet engine)
-  #+begin_src elisp
-    (use-package yasnippet
-      :straight t
-      :config
-      (yas-global-mode)
-      )
+#+begin_src elisp
+  (use-package yasnippet
+    :straight t
+    :config
+    (yas-global-mode)
+    )
 
-    (use-package yasnippet-snippets
-      :straight t
-      :defer t)
-  #+end_src
+  (use-package yasnippet-snippets
+    :straight t
+    :defer t)
+#+end_src
 
 * Treemacs
-  #+begin_src elisp
-    (use-package treemacs
-      :defer t
-      :straight t
-      :config
-      (setq treemacs-width 30)
-      )
+#+begin_src elisp
+  (use-package treemacs
+    :defer t
+    :straight t
+    :config
+    (setq treemacs-width 30)
+    )
 
-    (use-package treemacs-evil
-      :after treemacs
-      :straight t)
+  (use-package treemacs-evil
+    :after treemacs
+    :straight t)
 
-    (use-package treemacs-nerd-icons
-      :straight t
-      :config 
-      (treemacs-load-theme "nerd-icons")
-      )
-  #+end_src
+  (use-package treemacs-nerd-icons
+    :straight t
+    :config 
+    (treemacs-load-theme "nerd-icons")
+    )
+  
+  (use-package lsp-treemacs
+    :straight t
+    :after lsp-mode
+    )
+#+end_src
 
 * Projectile
-  #+begin_src emacs-lisp 
-    (use-package projectile
-      :straight t
-      :after evil
-      :config
-      (evil-global-set-key 'normal (kbd "C-p") 'helm-projectile)
-      )
-  #+end_src
+#+begin_src emacs-lisp 
+  (use-package projectile
+    :straight t
+    :after evil
+    :config
+    (evil-global-set-key 'normal (kbd "C-p") 'helm-projectile)
+    )
+#+end_src
 
-  Setup projectile for treemacs
+Setup projectile for treemacs
 
-  #+begin_src emacs-lisp 
-    (use-package treemacs-projectile
-      :straight t
-      :defer t)
-  #+end_src
+#+begin_src emacs-lisp 
+  (use-package treemacs-projectile
+    :straight t
+    :defer t)
+#+end_src
 
 * Emacs startup profilier ESUP
-  #+begin_src elisp
-    (use-package esup
-      :straight t
-      :init
-      (setq esup-depth 0))
-  #+end_src
+#+begin_src elisp
+  (use-package esup
+    :straight t
+    :init
+    (setq esup-depth 0))
+#+end_src
 
 * Eyeborwse
-  Multiple emacs "windows"
+Multiple emacs "windows"
 
-  #+begin_src emacs-lisp :tangle yes
-    (use-package eyebrowse
-      :straight t
-      :config
-      (eyebrowse-mode)
-      (eyebrowse-setup-opinionated-keys)
-      )
-  #+end_src
+#+begin_src emacs-lisp :tangle yes
+  (use-package eyebrowse
+    :straight t
+    :config
+    (eyebrowse-mode)
+    (eyebrowse-setup-opinionated-keys)
+    )
+#+end_src
 
 * Magit
-  #+begin_src emacs-lisp :tangle yes
-    (use-package magit
-      :straight t
-      :defer t)
-  #+end_src
+#+begin_src emacs-lisp :tangle yes
+  (use-package magit
+    :straight t
+    :defer t)
+#+end_src
 
-* Olivetti mode
-  Center the screen with org mode for a nicer writing experience
-  #+begin_src emacs-lisp :tangle yes
-    (use-package olivetti
-      :straight t
-      :defer t
-      :hook
-      (org-mode . (lambda () (olivetti-mode) (olivetti-set-width 120)))
-      (dashboard-mode . (lambda () (olivetti-mode) (olivetti-set-width 150)))
-      )
-  #+end_src
+* Olivetti 
+Center the screen with org mode for a nicer writing experience
+#+begin_src emacs-lisp :tangle yes
+  (use-package olivetti
+    :straight t
+    :defer t
+    :hook
+    (org-mode . (lambda () (olivetti-mode) (olivetti-set-width 120)))
+    (dashboard-mode . (lambda () (olivetti-mode) (olivetti-set-width 150)))
+    )
+#+end_src
 
 * Emacs custom dashboard
-  #+begin_src emacs-lisp :tangle yes
-    (use-package dashboard
-      :straight t
-      :config
-      (dashboard-setup-startup-hook)
-      (setq initial-buffer-choice 'dashboard-open)
-      (setq dashboard-image-banner-max-width 200)
-      (setq dashboard-startup-banner "~/.emacs.d/Icon_Emacs.webp")
-      (setq dashboard-display-icons-p t)
-      (setq dashboard-icon-type 'nerd-icons)
-      (setq dashboard-set-file-icons t)
-      )
-  #+end_src
+#+begin_src emacs-lisp :tangle yes
+  (use-package dashboard
+    :straight t
+    :config
+    (dashboard-setup-startup-hook)
+    (setq initial-buffer-choice 'dashboard-open)
+    (setq dashboard-image-banner-max-width 200)
+    (setq dashboard-startup-banner "~/.emacs.d/Icon_Emacs.webp")
+    (setq dashboard-display-icons-p t)
+    (setq dashboard-icon-type 'nerd-icons)
+    (setq dashboard-set-file-icons t)
+    )
+#+end_src
 
 * Bug hunter
-  It's hard to debug emacs so this is pretty nice
-  #+begin_src elisp
-    (use-package bug-hunter
-      :straight t
-      :defer t)
-  #+end_src
+It's hard to debug emacs so this is pretty nice
+#+begin_src elisp
+  (use-package bug-hunter
+    :straight t
+    :defer t)
+#+end_src
 
 * Which key
-  Display keybinds
-  #+begin_src elisp
-    (use-package which-key
-      :straight t
-      :config
-      (which-key-mode))
-  #+end_src
+Display keybinds
+#+begin_src elisp
+  (use-package which-key
+    :straight t
+    :config
+    (which-key-mode))
+#+end_src
 
 * EAT terminal emulator
-  #+begin_src emacs-lisp :tangle yes
-    (use-package eat
-      :straight (eat :type git
-                     :host codeberg
-                     :repo "akib/emacs-eat"
-                     :files ("*.el" ("term" "term/*.el") "*.texi"
-                             "*.ti" ("terminfo/e" "terminfo/e/*")
-                             ("terminfo/65" "terminfo/65/*")
-                             ("integration" "integration/*")
-                             (:exclude ".dir-locals.el" "*-tests.el")))
-      :config
-      (add-hook 'eat--char-mode-hook 'turn-off-evil-mode)
-      (add-hook 'eat--semi-char-mode-hook 'turn-on-evil-mode)
-      (evil-define-key nil eat-semi-char-mode-map (kbd "M-<return>") 'eat-char-mode)
-      (setq eat-enable-directory-tracking t)
-      )
-    
+#+begin_src emacs-lisp :tangle yes
+  (defun kill-buffer-and-delete-window-if-last ()
+    (kill-buffer)
+    (if (not (= 1 (length (window-list))))
+        (delete-window))
+    )
 
-  #+end_src
+  (use-package eat
+    :straight (eat :type git
+                   :host codeberg
+                   :repo "akib/emacs-eat"
+                   :files ("*.el" ("term" "term/*.el") "*.texi"
+                           "*.ti" ("terminfo/e" "terminfo/e/*")
+                           ("terminfo/65" "terminfo/65/*")
+                           ("integration" "integration/*")
+                           (:exclude ".dir-locals.el" "*-tests.el")))
+    :config
+    (add-hook 'eat--char-mode-hook 'turn-off-evil-mode)
+    (add-hook 'eat--semi-char-mode-hook 'turn-on-evil-mode)
+    (add-hook 'eat-exit-hook (lambda (val) (turn-on-evil-mode) (kill-buffer-and-delete-window-if-last)))
+    (evil-define-key nil eat-semi-char-mode-map (kbd "M-<return>") 'eat-char-mode)
+    (setq eat-enable-directory-tracking t)
+    )
+
+#+end_src
   
 * Dired
-  #+begin_src emacs-lisp :tangle yes
-    (use-package dired
-      :straight nil
-      :defer t
-      :after evil-collection
-      :custom
-      (dired-listing-switches "-lagho --group-directories-first")
-      (setq dired-dwim-target t)
-      :config
-      (evil-collection-define-key 'normal 'dired-mode-map
-        "h" 'dired-up-directory
-        "l" 'dired-find-file
-        "q" 'kill-buffer-and-window
-        "gh" 'go-home))
+#+begin_src emacs-lisp :tangle yes
+  (use-package dired
+    :straight nil
+    :defer t
+    :after evil-collection
+    :custom
+    (dired-listing-switches "-lagho --group-directories-first")
+    (setq dired-dwim-target t)
+    :config
+    (evil-collection-define-key 'normal 'dired-mode-map
+      "h" 'dired-up-directory
+      "l" 'dired-find-file
+      "q" 'kill-buffer-and-window
+      "gh" 'go-home))
 
-    (defun go-home () (interactive)
-           (find-alternate-file "~/"))
+  (defun go-home () (interactive)
+         (find-alternate-file "~/"))
 
-    					;    (use-package dired-single
-    					;      :straight t
-    					;      :after dired
-    					;      :config (evil-collection-define-key 'normal 'dired-mode-map
-    					;                "h" 'dired-single-up-directory
-    					;                "l" 'dired-single-buffer)
+  					;    (use-package dired-single
+  					;      :straight t
+  					;      :after dired
+  					;      :config (evil-collection-define-key 'normal 'dired-mode-map
+  					;                "h" 'dired-single-up-directory
+  					;                "l" 'dired-single-buffer)
 
-    (use-package nerd-icons-dired
-      :straight t
-      :after dired
-      :hook (dired-mode . nerd-icons-dired-mode)
-      )
+  (use-package nerd-icons-dired
+    :straight t
+    :after dired
+    :hook (dired-mode . nerd-icons-dired-mode)
+    )
 
-    (use-package dired-hide-dotfiles
-      :straight t
-      :after dired
-      :config
-      (evil-collection-define-key 'normal 'dired-mode-map
-        "H" 'dired-hide-dotfiles-mode))
-  #+end_src
+  (use-package dired-hide-dotfiles
+    :straight t
+    :after dired
+    :config
+    (evil-collection-define-key 'normal 'dired-mode-map
+      "H" 'dired-hide-dotfiles-mode))
+#+end_src
 
 * Reset garbage collector default value 
-  #+begin_src elisp
-    (setq gc-cons-threshold 800000)
-  #+end_src
+#+begin_src elisp
+  (setq garbage-collection-messages t) ; for debugging gc
+  (setq gc-cons-threshold 8000000) 
+  ; default (setq gc-cons-threshold 800000)
+#+end_src
 
