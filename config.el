@@ -291,7 +291,9 @@
   :straight t
   :after evil
   :config
+  (projectile-mode)
   (evil-global-set-key 'normal (kbd "C-p") 'helm-projectile)
+  (setq projectile-enable-caching t)
   )
 
 (use-package treemacs-projectile
@@ -404,5 +406,5 @@
     "H" 'dired-hide-dotfiles-mode))
 
 (setq garbage-collection-messages t) ; for debugging gc
-(setq gc-cons-threshold 8000000) 
+(setq gc-cons-threshold 80000000) 
 ; default (setq gc-cons-threshold 800000)

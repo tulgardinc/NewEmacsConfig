@@ -2,13 +2,12 @@
 #+PROPERTY: header-args :tangle config.el :results none
 
 * Things to do
-I might also consider changing the theme
 ** TODO Dap is broken
-** TODO Look into Vterm
-    
-* Plugins to look into
+** TODO Look into Vertigo
+** TODO Look into Corfu
+** TODO Plugin to look through TODOs in projectile project
+* Interesting plugins
 - Zoom
-- Ivy
 
 * Set garbage collector to a relaxed value
 this speeds up init time.
@@ -452,7 +451,9 @@ Helm with projectile
     :straight t
     :after evil
     :config
+    (projectile-mode)
     (evil-global-set-key 'normal (kbd "C-p") 'helm-projectile)
+    (setq projectile-enable-caching t)
     )
 #+end_src
 
@@ -605,7 +606,7 @@ Display keybinds
 * Reset garbage collector default value 
 #+begin_src elisp
   (setq garbage-collection-messages t) ; for debugging gc
-  (setq gc-cons-threshold 8000000) 
+  (setq gc-cons-threshold 80000000) 
   ; default (setq gc-cons-threshold 800000)
 #+end_src
 
