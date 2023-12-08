@@ -88,8 +88,11 @@
     					;pretty title
   (set-face-attribute 'org-document-title nil :height 250)  
   (set-face-attribute 'org-document-info-keyword nil :height 1)
-  					  				; keybinds
+					; keybinds
   (evil-define-key 'normal org-mode-map (kbd "C-t") 'org-todo)
+  (setq org-preview-latex-default-process 'dvisvgm)
+  (plist-put org-format-latex-options :background "Transparent")
+  (plist-put org-format-latex-options :scale 1.2)
   )
 
 (use-package org-superstar
@@ -131,6 +134,7 @@
   :after org
   :config 
   (setq-default org-download-image-dir "~/.emacs.d/org-files/images")
+  (setq org-download-annotate-function (lambda (val) ""))
   )
 
 (use-package undo-tree
@@ -341,7 +345,7 @@
   (dashboard-setup-startup-hook)
   (setq initial-buffer-choice 'dashboard-open)
   (setq dashboard-image-banner-max-width 200)
-  (setq dashboard-startup-banner "~/.emacs.d/Icon_Emacs.webp")
+  (setq dashboard-startup-banner "~/.emacs.d/pissed_anime.webp")
   (setq dashboard-display-icons-p t)
   (setq dashboard-icon-type 'nerd-icons)
   (setq dashboard-set-file-icons t)
