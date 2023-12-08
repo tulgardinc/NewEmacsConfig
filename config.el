@@ -57,7 +57,7 @@
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
   (evil-set-undo-system 'undo-tree)
-  (evil-define-key nil 'global (kbd "<escape>") 'keyboard-quit);  could cause a problem
+  ;(evil-define-key nil 'global (kbd "<escape>") 'keyboard-quit);  could cause a problem
   )
 
 (use-package evil-collection
@@ -108,12 +108,14 @@
   (setq org-roam-node-display-template
 	(concat "${title:*} "
 		(propertize "${tags:10}" 'face 'org-tag)))
+
   (defun find-org-notes ()
     "function to quickly sort through notes using ripgrep"
     (interactive)
     (let ((helm-rg--paths-to-search '("~/.emacs.d/org-files/")))
       (call-interactively (helm-rg "")))
     )
+
 
   (evil-global-set-key 'normal 
 		       (kbd "C-c n r") 'find-org-notes)
@@ -173,6 +175,8 @@
   :straight t
   :defer t
   :after evil
+  :hook 
+  (lsp-mode . (lambda () (add-hook 'before-save-hook 'lsp-format-buffer)))
   :config
   (setq lsp-inlay-hint-enable t)
   (setq lsp-rust-analyzer-inlay-hints-mode t)
@@ -180,7 +184,7 @@
   (setq lsp-rust-analyzer-display-chaining-hints t)
   (setq lsp-rust-analyzer-display-parameter-hints t)
   (setq lsp-modeline-diagnostics-scope :workspace)
-  ;(evil-define-key 'normal 'prog-mode-map (kbd "<f2>") 'lsp-rename)
+					;(evil-define-key 'normal 'prog-mode-map (kbd "<f2>") 'lsp-rename)
   (evil-define-key 'normal 'lsp-mode-map (kbd "<f2>") 'lsp-rename)
   (evil-define-key 'normal 'lsp-mode-map (kbd "M-<return>") 'lsp-execute-code-action)
   )
@@ -224,7 +228,7 @@
   (setq helm-move-to-line-cycle-in-source nil)
   (evil-define-key nil 'global (kbd "M-x") 'helm-M-x)
   (evil-define-key 'normal 'global
-    (kbd "C-b") 'helm-mini
+    (kbd "C-b") 'helm-buffers-list
     (kbd "S-C-b") 'helm-bookmarks
     (kbd "C-x C-f") 'helm-find-files)
   (evil-define-key nil helm-map
@@ -252,6 +256,8 @@
   :after projectile
   :straight t
   :config
+
+
   (define-key evil-normal-state-map (kbd "S-C-P") 'helm-projectile-rg)
   )
 
@@ -294,6 +300,11 @@
   (projectile-mode)
   (evil-global-set-key 'normal (kbd "C-p") 'helm-projectile)
   (setq projectile-enable-caching t)
+
+  (defun projectile-todos ()
+    "function to quickly find todos in a project"
+    (interactive)
+    (call-interactively (helm-rg "TODO")))
   )
 
 (use-package treemacs-projectile
