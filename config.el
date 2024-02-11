@@ -82,17 +82,45 @@
   (org-mode . org-indent-mode)
   (org-mode . org-display-inline-images)
   :config
-    					;indents and bullets
+					;indents and bullets
   (setq org-confirm-babel-evaluate nil)
   (setq org-hide-emphasis-markers t)
-    					;pretty title
+					;pretty title
   (set-face-attribute 'org-document-title nil :height 250)  
   (set-face-attribute 'org-document-info-keyword nil :height 1)
-					; keybinds
+      					; keybinds
   (evil-define-key 'normal org-mode-map (kbd "C-t") 'org-todo)
-  (setq org-preview-latex-default-process 'dvisvgm)
+
+  (setq org-startup-with-latex-preview t)
+					; transparent latex previews
+  (add-to-list 'org-preview-latex-process-alist
+	       '(custom-program :programs
+				("latex" "dvipng" "cwebp")
+				:description "dvi > png > webp" :message "you need to install the programs: latex and dvipng." :image-input-type "dvi" :image-output-type "webp" :image-size-adjust
+				(1.0 . 1.0)
+				:latex-compiler
+				("latex -interaction nonstopmode -output-directory %o %f")
+				:image-converter
+				("dvipng -D %D -T tight -o %O %f")
+				:transparent-image-converter
+				("dvipng -D %D -T tight -bg Transparent -o %O %f && cwebp -m 6 -lossless -alpha_q 0 -q 0 %O -o %O"))
+	       )
+
+  (setq org-preview-latex-default-process 'custom-program)
+
+
   (plist-put org-format-latex-options :background "Transparent")
-  (plist-put org-format-latex-options :scale 1.2)
+  (plist-put org-format-latex-options :scale 1.3)
+    					; org mode tab key fix
+  (defun yas-org-very-safe-expand ()
+    (let ((yas-fallback-behavior 'return-nil)) (yas-expand)))
+  (add-hook 'org-mode-hook
+    	    (lambda ()
+              (add-to-list 'org-tab-first-hook 'yas-org-very-safe-expand)
+              (define-key yas-keymap [tab] 'yas-next-field)))
+
+    					; org-babel
+  
   )
 
 (use-package org-superstar
@@ -135,6 +163,26 @@
   :config 
   (setq-default org-download-image-dir "~/.emacs.d/org-files/images")
   (setq org-download-annotate-function (lambda (val) ""))
+  )
+
+;(use-package ein
+  					;  :straight t
+  					;:custom (ein:jupyter-server-use-subcommand "server")
+  					;  )
+
+(use-package jupyter
+  :straight t
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '(
+     (emacs-lisp . t)
+     (python . t)
+     (jupyter . t)
+     (jupyter-python . t)
+					;(ein . t)
+     )
+   )
   )
 
 (use-package undo-tree
@@ -187,6 +235,7 @@
   (setq lsp-rust-analyzer-server-display-hints t)
   (setq lsp-rust-analyzer-display-chaining-hints t)
   (setq lsp-rust-analyzer-display-parameter-hints t)
+  (setq lsp-signature-auto-activate nil)
   (setq lsp-modeline-diagnostics-scope :workspace)
 					;(evil-define-key 'normal 'prog-mode-map (kbd "<f2>") 'lsp-rename)
   (evil-define-key 'normal 'lsp-mode-map (kbd "<f2>") 'lsp-rename)
@@ -346,6 +395,7 @@
   (setq initial-buffer-choice 'dashboard-open)
   (setq dashboard-image-banner-max-width 200)
   (setq dashboard-startup-banner "~/.emacs.d/pissed_anime.webp")
+  ;(setq dashboard-startup-banner "~/.emacs.d/Icon_Emacs.webp")
   (setq dashboard-display-icons-p t)
   (setq dashboard-icon-type 'nerd-icons)
   (setq dashboard-set-file-icons t)
