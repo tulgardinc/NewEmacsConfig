@@ -41,6 +41,8 @@
 
 (setq backup-directory-alist `(("." . "~/.emacs.d/emacs_saves")))
 (setq backup-by-copying t)
+(setq auto-save-file-name-transforms
+    `((".*" ,(no-littering-expand-var-file-name "auto_save/") t)))
 
 (set-face-attribute 'default nil :family "JetBrainsMono Nerd Font" :height 110)
 					;(set-face-attribute 'default nil :family "Ubuntu mono" :height 120)
@@ -170,20 +172,20 @@
   					;:custom (ein:jupyter-server-use-subcommand "server")
   					;  )
 
-(use-package jupyter
-  :straight t
-  :config
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '(
-     (emacs-lisp . t)
-     (python . t)
-     (jupyter . t)
-     (jupyter-python . t)
-					;(ein . t)
-     )
-   )
-  )
+;(use-package jupyter
+;  :straight t
+;  :config
+;  (org-babel-do-load-languages
+;   'org-babel-load-languages
+;   '(
+;     (emacs-lisp . t)
+;     (python . t)
+;     (jupyter . t)
+;     (jupyter-python . t)
+;					;(ein . t)
+;     )
+;   )
+;  )
 
 (use-package undo-tree
   :straight t
@@ -223,13 +225,20 @@
   (push '(treemacs-hl-line-face . solaire-hl-line-face) solaire-mode-remap-alist)
   )
 
+(use-package pyvenv
+  :straight t
+  :defer t)
+
 (use-package lsp-mode
   :straight t
   :defer t
   :after evil
   :hook 
   (lsp-mode . (lambda () (add-hook 'before-save-hook 'lsp-format-buffer)))
+  (typescript-ts-mode . lsp)
+  (python-mode . lsp)
   :config
+  (setq-default indent-tabs-mode nil)
   (setq lsp-inlay-hint-enable t)
   (setq lsp-rust-analyzer-inlay-hints-mode t)
   (setq lsp-rust-analyzer-server-display-hints t)
@@ -237,7 +246,6 @@
   (setq lsp-rust-analyzer-display-parameter-hints t)
   (setq lsp-signature-auto-activate nil)
   (setq lsp-modeline-diagnostics-scope :workspace)
-					;(evil-define-key 'normal 'prog-mode-map (kbd "<f2>") 'lsp-rename)
   (evil-define-key 'normal 'lsp-mode-map (kbd "<f2>") 'lsp-rename)
   (evil-define-key 'normal 'lsp-mode-map (kbd "M-<return>") 'lsp-execute-code-action)
   )
@@ -252,6 +260,36 @@
   (setq lsp-ui-sideline-enable nil)
   (setq lsp-ui-doc-delay 1.5)
   )
+
+(use-package treesit-auto
+  :straight t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-ts-mode))
+  (global-treesit-auto-mode))
+
+(use-package rjsx-mode
+    :straight t)
+
+;  (use-package typescript-mode
+;    :straight t
+;    :after tree-sitter
+;    :config
+;    (define-derived-mode typescriptreact-mode typescript-mode
+;      "TypeScript TSX")
+
+    ;(add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescriptreact-mode))
+    ;(add-to-list 'auto-mode-alist '("\\.tsx?\\'" . (lambda () (lsp))))
+    ;(add-to-list 'tree-sitter-major-mode-language-alist '(typescriptreact-mode . tsx)))
+
+  (use-package apheleia
+    :straight t
+    :ensure t
+    :config
+    (apheleia-global-mode t))
+  
+  (use-package lsp-tailwindcss
+    :straight t
+    :ensure t)
 
 (use-package company
   :straight t
@@ -328,7 +366,7 @@
   :defer t
   :straight t
   :config
-  (setq treemacs-width 30)
+  (setq treemacs-width 35)
   )
 
 (use-package treemacs-evil
@@ -393,7 +431,7 @@
   :config
   (dashboard-setup-startup-hook)
   (setq initial-buffer-choice 'dashboard-open)
-  (setq dashboard-image-banner-max-width 200)
+  (setq dashboard-image-banner-max-width 300)
   (setq dashboard-startup-banner "~/.emacs.d/pissed_anime.webp")
   ;(setq dashboard-startup-banner "~/.emacs.d/Icon_Emacs.webp")
   (setq dashboard-display-icons-p t)
